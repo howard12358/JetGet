@@ -1,17 +1,3 @@
-html {
-    background-color: rgba(27, 38, 54, 1);
-    text-align: center;
-    color: white;
-}
-
-body {
-    margin: 0;
-    color: white;
-    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-}
-
 @font-face {
     font-family: "Nunito";
     font-style: normal;
@@ -20,7 +6,23 @@ body {
     url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
 }
 
-#app {
-    height: 100vh;
-    text-align: center;
+/* 保证 html/body/#app 都撑满，避免局部父容器高度不足导致 100vh 才是唯一高度控制 */
+html, body, #app {
+    height: 100%;
+    margin: 0;
+    background-color: rgba(27, 38, 54, 1);
+    color: white;
+    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
+
+/* 让根容器在需要时填满 */
+.app-root {
+    height: 100%;
+}
+
+/* 你可以按需调整 logo、menu 的样式 */
+.logo {
+    color: white;
 }
