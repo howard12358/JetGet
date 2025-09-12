@@ -1,11 +1,20 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import { ArrowDownload16Regular } from '@vicons/fluent'
-import { Settings } from '@vicons/carbon'
+import { Settings, Search } from '@vicons/carbon'
 
 const routes = [
     {
         path: '/',
         redirect: '/download'
+    },
+    {
+        path: '/search',
+        name: 'Search',
+        component: () => import('@/pages/Search.vue'),
+        meta: {
+            label: 'Search',
+            icon: Search
+        }
     },
     {
         path: '/download',

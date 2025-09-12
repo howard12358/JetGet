@@ -10,15 +10,22 @@
 html, body, #app {
     height: 100%;
     margin: 0;
-    background-color: rgba(27, 38, 54, 1);
     color: white;
     font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
 }
 
+/* 确保 body 也没有滚动 */
+body {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
 /* 让根容器在需要时填满 */
 .app-root {
+    overflow: hidden;
     height: 100%;
 }
 

@@ -1,6 +1,6 @@
 <script setup>
 import {NIcon} from "naive-ui";
-import {h, ref, watch} from "vue";
+import {h, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 
 const router = useRouter();
@@ -10,10 +10,18 @@ function renderIcon(icon) {
   return () => h(NIcon, null, {default: () => h(icon)});
 }
 
-// 从路由表动态生成菜单
-const menuOptions = router.getRoutes()
-    // 只取那些带 meta.label 的
-    .filter(r => r.meta && r.meta.label)
+// 从路由表动态生成菜单，排除 Setting
+const mainMenuOptions = router.getRoutes()
+    .filter(r => r.meta && r.meta.label && r.name !== 'Setting')
+    .map(r => ({
+      label: r.meta.label,
+      key: r.path,
+      icon: r.meta.icon ? renderIcon(r.meta.icon) : undefined
+    }))
+
+// Setting 菜单单独处理
+const settingMenuOptions = router.getRoutes()
+    .filter(r => r.meta && r.meta.label && r.name === 'Setting')
     .map(r => ({
       label: r.meta.label,
       key: r.path,
@@ -32,6 +40,12 @@ function handleMenuUpdate(val) {
     router.push(key)
   }
 }
+
+
+onMounted(() => {
+  console.log(mainMenuOptions)
+  console.log(settingMenuOptions)
+})
 </script>
 
 <template>
@@ -45,23 +59,37 @@ function handleMenuUpdate(val) {
             :collapsed-width="64"
             :native-scrollbar="false"
             collapsed
-            style="height:100vh; display:flex; flex-direction:column;"
+            style="height:100vh; position: relative;"
         >
-          <!-- 用 v-model:value 双向绑定选中项，并监听 update:value 以跳转 -->
+          <!-- 主菜单 -->
           <n-menu
               v-model:value="selectedKey"
-              :options="menuOptions"
+              :options="mainMenuOptions"
               collapsed
               :collapsed-width="64"
               :collapsed-icon-size="22"
               @update:value="handleMenuUpdate"
-              style="flex: 1 1 auto;"
+              style="padding: 5px 0 80px;"
+              class="main-menu"
           />
+
+          <!-- 底部固定的 Setting 菜单 -->
+          <div style="position: absolute; bottom: 5px; width: 100%;">
+            <n-menu
+                v-model:value="selectedKey"
+                :options="settingMenuOptions"
+                collapsed
+                :collapsed-width="64"
+                :collapsed-icon-size="22"
+                @update:value="handleMenuUpdate"
+                class="bottom-menu"
+            />
+          </div>
         </n-layout-sider>
 
         <!-- 右侧主区域，同样撑满高度并可滚动 -->
-        <n-layout style="height:100vh;">
-          <n-layout-content style="height:100vh; overflow:auto; padding:16px;">
+        <n-layout style="height:100vh; padding:16px">
+          <n-layout-content>
             <!-- 路由视图：路由内容会在这里渲染 -->
             <router-view/>
           </n-layout-content>
