@@ -42,10 +42,6 @@ function handleMenuUpdate(val) {
 }
 
 
-onMounted(() => {
-  console.log(mainMenuOptions)
-  console.log(settingMenuOptions)
-})
 </script>
 
 <template>
@@ -56,7 +52,7 @@ onMounted(() => {
         <n-layout-sider
             bordered
             collapse-mode="width"
-            :collapsed-width="64"
+            :collapsed-width="58"
             :native-scrollbar="false"
             collapsed
             style="height:100vh; position: relative;"
@@ -66,7 +62,7 @@ onMounted(() => {
               v-model:value="selectedKey"
               :options="mainMenuOptions"
               collapsed
-              :collapsed-width="64"
+              :collapsed-width="58"
               :collapsed-icon-size="22"
               @update:value="handleMenuUpdate"
               style="padding: 5px 0 80px;"
@@ -79,7 +75,7 @@ onMounted(() => {
                 v-model:value="selectedKey"
                 :options="settingMenuOptions"
                 collapsed
-                :collapsed-width="64"
+                :collapsed-width="58"
                 :collapsed-icon-size="22"
                 @update:value="handleMenuUpdate"
                 class="bottom-menu"

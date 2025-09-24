@@ -5,7 +5,7 @@ import { Settings, Search } from '@vicons/carbon'
 const routes = [
     {
         path: '/',
-        redirect: '/download'
+        redirect: '/search'
     },
     {
         path: '/search',

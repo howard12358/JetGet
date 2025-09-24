@@ -1,6 +1,9 @@
 package main
 
 import (
+	"JetGet/backend/config/db"
+	"JetGet/backend/service"
+	"context"
 	"embed"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"log"
@@ -21,9 +24,16 @@ var icon []byte
 func main() {
 	// Create an instance of the app structure
 	app := NewApp()
+	err := db.InitDB()
+	if err != nil {
+		log.Fatalf("failed to init db: %v", err)
+	}
+
+	sysService := service.NewSysService()
+	downloadService := service.NewDownloadService()
 
 	// Create application with options
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		Title:             "JetGet",
 		Width:             1050,
 		Height:            700,
@@ -41,13 +51,19 @@ func main() {
 		Menu:              nil,
 		Logger:            nil,
 		LogLevel:          logger.DEBUG,
-		OnStartup:         app.startup,
-		OnDomReady:        app.domReady,
-		OnBeforeClose:     app.beforeClose,
-		OnShutdown:        app.shutdown,
-		WindowStartState:  options.Normal,
+		OnStartup: func(ctx context.Context) {
+			app.startup(ctx)
+			sysService.Startup(ctx)
+			downloadService.Startup(ctx)
+		},
+		OnDomReady:       app.domReady,
+		OnBeforeClose:    app.beforeClose,
+		OnShutdown:       app.shutdown,
+		WindowStartState: options.Normal,
 		Bind: []interface{}{
 			app,
+			sysService,
+			downloadService,
 		},
 		// Windows platform specific options
 		Windows: &windows.Options{
