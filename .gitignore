@@ -109,6 +109,7 @@ dist
 
 IFLOW.md
 
+package-lock.json
 build/bin
 frontend/wailsjs
 frontend/package.json.md5
