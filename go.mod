@@ -8,6 +8,7 @@ require (
 	github.com/Code-Hex/updater v0.0.0-20160712085121-c3f278672520
 	github.com/Songmu/prompter v0.5.1
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
+	github.com/google/wire v0.7.0
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/mholt/archiver v3.1.1+incompatible
 	github.com/pkg/errors v0.9.1

@@ -108,3 +108,7 @@ dist
 .idea
 
 IFLOW.md
+
+build/bin
+frontend/wailsjs
+frontend/package.json.md5

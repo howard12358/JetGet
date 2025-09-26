@@ -1,4 +1,4 @@
-export namespace model {
+export namespace m {
 	
 	export class SysConfig {
 	    ID: string;

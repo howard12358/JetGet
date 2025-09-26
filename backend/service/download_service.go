@@ -1,19 +1,23 @@
 package service
 
 import (
+	"JetGet/backend/config/db"
 	"JetGet/backend/pget"
 	"JetGet/backend/util"
 	"context"
 	"fmt"
+	"gorm.io/gorm"
 	"os"
 )
 
 type DownloadService struct {
-	ctx context.Context
+	ctx    context.Context
+	db     *gorm.DB
+	hostId db.HostId
 }
 
-func NewDownloadService() *DownloadService {
-	return &DownloadService{}
+func NewDownloadService(db *gorm.DB, hostId db.HostId) *DownloadService {
+	return &DownloadService{db: db, hostId: hostId}
 }
 
 func (d *DownloadService) Startup(ctx context.Context) {

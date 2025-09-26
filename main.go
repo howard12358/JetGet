@@ -1,8 +1,7 @@
 package main
 
 import (
-	"JetGet/backend/config/db"
-	"JetGet/backend/service"
+	"JetGet/backend/injector"
 	"context"
 	"embed"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -22,15 +21,11 @@ var assets embed.FS
 var icon []byte
 
 func main() {
-	// Create an instance of the app structure
-	app := NewApp()
-	err := db.InitDB()
+	app, err := injector.InitializeApp()
 	if err != nil {
-		log.Fatalf("failed to init db: %v", err)
+		log.Fatalf("failed to init app: %v", err)
+		return
 	}
-
-	sysService := service.NewSysService()
-	downloadService := service.NewDownloadService()
 
 	// Create application with options
 	err = wails.Run(&options.App{
@@ -52,18 +47,15 @@ func main() {
 		Logger:            nil,
 		LogLevel:          logger.DEBUG,
 		OnStartup: func(ctx context.Context) {
-			app.startup(ctx)
-			sysService.Startup(ctx)
-			downloadService.Startup(ctx)
+			app.Startup(ctx)
 		},
-		OnDomReady:       app.domReady,
-		OnBeforeClose:    app.beforeClose,
-		OnShutdown:       app.shutdown,
+		OnDomReady:       app.DomReady,
+		OnBeforeClose:    app.BeforeClose,
+		OnShutdown:       app.Shutdown,
 		WindowStartState: options.Normal,
 		Bind: []interface{}{
-			app,
-			sysService,
-			downloadService,
+			app.SysService,
+			app.DownloadService,
 		},
 		// Windows platform specific options
 		Windows: &windows.Options{
@@ -75,14 +67,6 @@ func main() {
 		},
 		// Mac platform specific options
 		Mac: &mac.Options{
-			//TitleBar: &mac.TitleBar{
-			//	TitlebarAppearsTransparent: false,
-			//	HideTitle:                  false,
-			//	HideTitleBar:               false,
-			//	FullSizeContent:            false,
-			//	UseToolbar:                 false,
-			//	HideToolbarSeparator:       false,
-			//},
 			TitleBar:             mac.TitleBarDefault(),
 			Appearance:           mac.NSAppearanceNameDarkAqua,
 			WebviewIsTransparent: true,
