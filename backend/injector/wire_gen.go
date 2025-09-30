@@ -26,7 +26,7 @@ func InitializeApp() (*app.App, error) {
 		return nil, err
 	}
 	sysService := service.NewSysService(gormDB, hostId)
-	downloadService := service.NewDownloadService(gormDB, hostId)
+	downloadService := service.NewDownloadService(gormDB, hostId, sysService)
 	appApp := app.NewApp(sysService, downloadService)
 	return appApp, nil
 }

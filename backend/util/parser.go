@@ -14,13 +14,13 @@ func ToPgetArgs(url string) []string {
 	ags = append(ags, "-p")
 	ags = append(ags, "4")
 	ags = append(ags, "-o")
-	ags = append(ags, defaultDownloadsDir())
+	ags = append(ags, DefaultDownloadDir())
 
 	ags = append(ags, url)
 	return ags
 }
 
-func defaultDownloadsDir() string {
+func DefaultDownloadDir() string {
 	// 简单且通常有效的做法：用 home + "Downloads"
 	// 更严格的实现可以在 Linux 读取 ~/.config/user-dirs.dirs 中 XDG_DOWNLOAD_DIR
 	home, err := os.UserHomeDir()

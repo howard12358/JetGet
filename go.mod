@@ -1,6 +1,6 @@
 module JetGet
 
-go 1.22.0
+go 1.24.0
 
 toolchain go1.24.4
 
@@ -8,6 +8,7 @@ require (
 	github.com/Code-Hex/updater v0.0.0-20160712085121-c3f278672520
 	github.com/Songmu/prompter v0.5.1
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
+	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.7.0
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/mholt/archiver v3.1.1+incompatible
@@ -28,7 +29,6 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

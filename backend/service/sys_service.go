@@ -2,7 +2,8 @@ package service
 
 import (
 	"JetGet/backend/config/db"
-	"JetGet/backend/storage/m"
+	"JetGet/backend/types/m"
+	"JetGet/backend/util"
 	"context"
 	"errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -28,9 +29,7 @@ func (s *SysService) Startup(ctx context.Context) {
 }
 
 func (s *SysService) ChooseDirectory() (string, error) {
-	dir, err := runtime.OpenDirectoryDialog(s.ctx, runtime.OpenDialogOptions{
-		Title: "选择下载目录",
-	})
+	dir, err := runtime.OpenDirectoryDialog(s.ctx, runtime.OpenDialogOptions{Title: "选择下载目录"})
 	if err != nil {
 		return "", err
 	}
@@ -40,16 +39,15 @@ func (s *SysService) ChooseDirectory() (string, error) {
 // GetConfig 获取系统配置
 func (s *SysService) GetConfig() (*m.SysConfig, error) {
 	var config m.SysConfig
-	// 使用注入的 s.db 和 s.hostId
 	result := s.db.Where("id = ?", s.hostId).First(&config)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			// 如果没有找到配置，返回一个带默认值的新配置
-			return &m.SysConfig{
-				ID:          string(s.hostId),
-				DownloadDir: "",
-				Proxy:       "",
-			}, nil
+			newSysConfig := m.SysConfig{ID: string(s.hostId)}
+			res := s.db.Model(&m.SysConfig{}).Create(newSysConfig)
+			if res.Error != nil {
+				return nil, res.Error
+			}
+			return &newSysConfig, nil
 		}
 		return nil, result.Error
 	}
@@ -63,8 +61,10 @@ func (s *SysService) SaveConfig(downloadDir, proxy string) error {
 		DownloadDir: downloadDir,
 		Proxy:       proxy,
 	}
+
+	newConfig := config
 	// 使用 FirstOrCreate 来简化逻辑：如果记录存在则加载，不存在则创建
-	result := s.db.Where("id = ?", s.hostId).FirstOrCreate(&m.SysConfig{})
+	result := s.db.Where("id = ?", s.hostId).FirstOrCreate(&newConfig)
 	if result.RowsAffected == 0 {
 		result = s.db.Model(&m.SysConfig{}).Where("id = ?", s.hostId).Updates(config)
 		if result.Error != nil {
@@ -72,4 +72,20 @@ func (s *SysService) SaveConfig(downloadDir, proxy string) error {
 		}
 	}
 	return nil
+}
+
+func (s *SysService) GetDownloadPath() string {
+	config, err := s.GetConfig()
+	if err != nil {
+		return util.DefaultDownloadDir()
+	}
+	return config.DownloadDir
+}
+
+func (s *SysService) GetProxy() string {
+	config, err := s.GetConfig()
+	if err != nil {
+		return ""
+	}
+	return config.Proxy
 }

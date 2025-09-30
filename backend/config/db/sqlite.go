@@ -1,7 +1,7 @@
 package db
 
 import (
-	"JetGet/backend/storage/m"
+	"JetGet/backend/types/m"
 	"JetGet/backend/util"
 	"fmt"
 	"github.com/google/wire"
@@ -49,7 +49,7 @@ func ProvideDB() (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	// 自动迁移
-	if err := gdb.AutoMigrate(&m.SysConfig{}); err != nil {
+	if err := gdb.AutoMigrate(&m.SysConfig{}, &m.DownloadTask{}); err != nil {
 		return nil, fmt.Errorf("failed to migrate db: %w", err)
 	}
 

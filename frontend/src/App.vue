@@ -2,6 +2,7 @@
 import {NIcon} from "naive-ui";
 import {h, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
+import {InitWailsListeners} from "../event/EventHub";
 
 const router = useRouter();
 const route = useRoute();
@@ -41,7 +42,9 @@ function handleMenuUpdate(val) {
   }
 }
 
-
+onMounted(()=>{
+  InitWailsListeners()
+})
 </script>
 
 <template>
