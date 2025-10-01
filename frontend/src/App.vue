@@ -1,50 +1,49 @@
-<script setup>
+<script setup lang="ts">
+import type {MenuOption} from 'naive-ui'
 import {NIcon} from "naive-ui";
-import {h, onMounted, ref, watch} from "vue";
+import {type Component, h, onMounted, ref, type VNodeChild, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import {InitWailsListeners} from "../event/EventHub";
+import {InitWailsListeners} from "@/event/EventHub";
 
 const router = useRouter();
 const route = useRoute();
 
-function renderIcon(icon) {
+function renderIcon(icon: Component): () => VNodeChild {
   return () => h(NIcon, null, {default: () => h(icon)});
 }
 
 // 从路由表动态生成菜单，排除 Setting
-const mainMenuOptions = router.getRoutes()
+const mainMenuOptions: MenuOption[] = router.getRoutes()
     .filter(r => r.meta && r.meta.label && r.name !== 'Setting')
     .map(r => ({
-      label: r.meta.label,
+      label: r.meta.label as string, // 断言为 string
       key: r.path,
-      icon: r.meta.icon ? renderIcon(r.meta.icon) : undefined
-    }))
+      icon: r.meta.icon ? renderIcon(r.meta.icon as Component) : undefined
+    }));
 
 // Setting 菜单单独处理
-const settingMenuOptions = router.getRoutes()
+const settingMenuOptions: MenuOption[] = router.getRoutes()
     .filter(r => r.meta && r.meta.label && r.name === 'Setting')
     .map(r => ({
-      label: r.meta.label,
+      label: r.meta.label as string,
       key: r.path,
-      icon: r.meta.icon ? renderIcon(r.meta.icon) : undefined
-    }))
+      icon: r.meta.icon ? renderIcon(r.meta.icon as Component) : undefined
+    }));
 
-// 选中项和路由同步
-const selectedKey = ref(route.path)
-watch(() => route.path, (p) => {
-  selectedKey.value = p
-})
+const selectedKey = ref<string>(route.path);
+watch(() => route.path, (newPath: string) => {
+  selectedKey.value = newPath;
+});
 
-function handleMenuUpdate(val) {
-  const key = Array.isArray(val) ? val[0] : val
+function handleMenuUpdate(key: string): void {
   if (key && key !== route.path) {
-    router.push(key)
+    router.push(key);
   }
 }
 
-onMounted(()=>{
-  InitWailsListeners()
-})
+onMounted(() => {
+  InitWailsListeners();
+});
 </script>
 
 <template>

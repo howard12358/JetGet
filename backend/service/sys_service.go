@@ -89,3 +89,5 @@ func (s *SysService) GetProxy() string {
 	}
 	return config.Proxy
 }
+
+func (s *SysService) GenSysConfig(*m.SysConfig) {}

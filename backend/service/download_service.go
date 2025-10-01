@@ -26,11 +26,11 @@ type DownloadService struct {
 	db     *gorm.DB
 	hostId db.HostId
 
-	*SysService
+	sysService *SysService
 }
 
 func NewDownloadService(db *gorm.DB, hostId db.HostId, sysService *SysService) *DownloadService {
-	return &DownloadService{db: db, hostId: hostId, SysService: sysService}
+	return &DownloadService{db: db, hostId: hostId, sysService: sysService}
 }
 
 func (d *DownloadService) Startup(ctx context.Context) {
@@ -42,12 +42,12 @@ var Version string
 // DownloadFile 下载文件
 func (d *DownloadService) DownloadFile(url string) (string, error) {
 	taskId := uuid.New().String()
-	resp, err := DoHeadRequest(url, d.SysService.GetProxy())
+	resp, err := DoHeadRequest(url, d.sysService.GetProxy())
 	if err != nil {
 		return "", err
 	}
 	fileName := GetFileName(resp)
-	savePath := d.SysService.GetDownloadPath()
+	savePath := d.sysService.GetDownloadPath()
 	task := &m.DownloadTask{
 		ID:       taskId,
 		URL:      url,
@@ -75,7 +75,7 @@ func (d *DownloadService) DownloadFile(url string) (string, error) {
 				Status:         m.StatusDownloading,
 			})
 
-			runtime.EventsEmit(d.ctx, e.DownloadProgress, e.ProgressEvent{
+			runtime.EventsEmit(d.ctx, e.DownloadProgress, e.Progress{
 				ID:         taskId,
 				Downloaded: downloaded,
 				Total:      total,
@@ -91,7 +91,7 @@ func (d *DownloadService) DownloadFile(url string) (string, error) {
 				Status:       m.StatusFailed,
 				ErrorMessage: errMsg,
 			})
-			runtime.EventsEmit(d.ctx, e.DownloadFailed, e.ProgressEvent{
+			runtime.EventsEmit(d.ctx, e.DownloadFailed, e.Progress{
 				ID:     taskId,
 				Status: m.StatusFailed,
 				Msg:    errMsg,
@@ -104,7 +104,7 @@ func (d *DownloadService) DownloadFile(url string) (string, error) {
 				CompletedAt: time.Now(),
 			})
 			// 通知前端任务完成
-			runtime.EventsEmit(d.ctx, e.DownloadCompleted, e.ProgressEvent{
+			runtime.EventsEmit(d.ctx, e.DownloadCompleted, e.Progress{
 				ID:     taskId,
 				Status: m.StatusCompleted,
 			})
@@ -166,3 +166,7 @@ func GetFileName(resp *http.Response) string {
 	}
 	return "unrecognized"
 }
+
+// 用于 wails 生成前端实体
+func (d *DownloadService) GenDownloadTaskResp(task *m.DownloadTaskResp) {}
+func (d *DownloadService) GenProgress(progress *e.Progress)             {}

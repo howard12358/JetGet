@@ -11,8 +11,8 @@ const (
 	DownloadFailed    = "download:failed"
 )
 
-// ProgressEvent 定义了发送给前端的进度事件结构体
-type ProgressEvent struct {
+// Progress 定义了发送给前端的进度事件结构体
+type Progress struct {
 	ID         string       `json:"id"`
 	Downloaded int64        `json:"downloaded"`
 	Total      int64        `json:"total"`

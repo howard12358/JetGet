@@ -33,3 +33,8 @@ type DownloadTask struct {
 func (dt DownloadTask) TableName() string {
 	return "download_task"
 }
+
+type DownloadTaskResp struct {
+	Speed int64 `json:"speed"`
+	*DownloadTask
+}
