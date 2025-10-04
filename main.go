@@ -2,14 +2,13 @@ package main
 
 import (
 	"JetGet/backend/injector"
+	"JetGet/backend/zaplog"
 	"context"
 	"embed"
-	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-	"log"
-
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
@@ -23,9 +22,11 @@ var icon []byte
 func main() {
 	app, err := injector.InitializeApp()
 	if err != nil {
-		log.Fatalf("failed to init app: %v", err)
+		zaplog.SLog.Fatalf("failed to init app: %v", err)
 		return
 	}
+	// 确保在程序退出时，所有缓冲的日志都被写入
+	defer zaplog.SLog.Sync()
 
 	// Create application with options
 	err = wails.Run(&options.App{
@@ -44,7 +45,7 @@ func main() {
 		BackgroundColour:  &options.RGBA{R: 255, G: 255, B: 255, A: 255},
 		AssetServer:       &assetserver.Options{Assets: assets},
 		Menu:              nil,
-		Logger:            nil,
+		Logger:            zaplog.CustomLogger,
 		LogLevel:          logger.DEBUG,
 		OnStartup: func(ctx context.Context) {
 			app.Startup(ctx)
@@ -80,6 +81,6 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		zaplog.SLog.Fatalf("failed to run app: %v", err)
 	}
 }

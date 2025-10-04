@@ -6,7 +6,7 @@
       label-align="left"
       label-width="auto"
       size="small"
-      style="margin: 8px"
+      style="margin: 10px"
   >
     <n-form-item label="下载目录">
       <n-input

@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -14,13 +15,15 @@ type SysService struct {
 	ctx    context.Context
 	db     *gorm.DB
 	hostId db.HostId
+	log    *zap.SugaredLogger
 }
 
 // NewSysService 是 SysService 的构造函数，它接收 *gorm.DB 和 HostId 作为依赖
-func NewSysService(db *gorm.DB, hostId db.HostId) *SysService {
+func NewSysService(db *gorm.DB, hostId db.HostId, log *zap.SugaredLogger) *SysService {
 	return &SysService{
 		db:     db,
 		hostId: hostId,
+		log:    log,
 	}
 }
 
@@ -43,7 +46,7 @@ func (s *SysService) GetConfig() (*m.SysConfig, error) {
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			newSysConfig := m.SysConfig{ID: string(s.hostId)}
-			res := s.db.Model(&m.SysConfig{}).Create(newSysConfig)
+			res := s.db.Model(&m.SysConfig{}).Create(&newSysConfig)
 			if res.Error != nil {
 				return nil, res.Error
 			}
@@ -90,4 +93,5 @@ func (s *SysService) GetProxy() string {
 	return config.Proxy
 }
 
+// 用于 wails 生成前端实体
 func (s *SysService) GenSysConfig(*m.SysConfig) {}

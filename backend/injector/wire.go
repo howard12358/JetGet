@@ -7,6 +7,7 @@ import (
 	"JetGet/backend/app"
 	"JetGet/backend/config/db"
 	"JetGet/backend/service"
+	"JetGet/backend/zaplog"
 	"github.com/google/wire"
 )
 
@@ -15,6 +16,7 @@ import (
 func InitializeApp() (*app.App, error) {
 	// wire.Build 会根据下面的 Provider 集合自动生成依赖注入代码
 	wire.Build(
+		zaplog.InitLogger,
 		// 数据库层 Provider
 		db.WireDBSet,
 		// 服务层 Provider

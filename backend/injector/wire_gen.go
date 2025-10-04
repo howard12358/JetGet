@@ -10,6 +10,7 @@ import (
 	"JetGet/backend/app"
 	"JetGet/backend/config/db"
 	"JetGet/backend/service"
+	"JetGet/backend/zaplog"
 )
 
 // Injectors from wire.go:
@@ -25,8 +26,9 @@ func InitializeApp() (*app.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	sysService := service.NewSysService(gormDB, hostId)
-	downloadService := service.NewDownloadService(gormDB, hostId, sysService)
+	sugaredLogger := zaplog.InitLogger()
+	sysService := service.NewSysService(gormDB, hostId, sugaredLogger)
+	downloadService := service.NewDownloadService(gormDB, hostId, sysService, sugaredLogger)
 	appApp := app.NewApp(sysService, downloadService)
 	return appApp, nil
 }

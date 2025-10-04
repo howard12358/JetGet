@@ -1,16 +1,13 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    // 支持动态 import / Promise
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "lib": [
       "ESNext",
       "DOM"
     ],
-    // 支持 Promise、浏览器 API
     "strict": true,
-    // 开启严格模式
     "jsx": "preserve",
     "skipLibCheck": true,
     "baseUrl": ".",
@@ -24,7 +21,8 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
-    "src/**/*.vue"
+    "src/**/*.vue",
+    "vite.config.ts"
   ],
   "exclude": [
     "node_modules",
