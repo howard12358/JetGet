@@ -6,6 +6,13 @@ export const useDownloadStore = defineStore('download', () => {
     // state: 明确类型为 Record<string, m.DownloadTask>，表示一个以任务ID为键，任务对象为值的集合
     const tasks = ref<Record<string, m.DownloadTaskResp>>({});
 
+    // action: 初始化或批量添加任务
+    function initTasks(initialTasks: m.DownloadTaskResp[]) {
+        for (const task of initialTasks) {
+            tasks.value[task.id] = task;
+        }
+    }
+
     // action: 新增下载任务
     function addNewTask(task: m.DownloadTaskResp) {
         tasks.value[task.id] = task;
@@ -30,6 +37,7 @@ export const useDownloadStore = defineStore('download', () => {
             task.status = progress.status;
             task.downloadedSize = task.totalSize; // 完成时确保进度为100%
             task.speed = 0;
+            task.completedAt = progress.completedAt;
         }
     }
 
@@ -45,6 +53,7 @@ export const useDownloadStore = defineStore('download', () => {
 
     return {
         tasks,
+        initTasks,
         addNewTask,
         updateTaskProgress,
         setTaskCompleted,

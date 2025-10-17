@@ -1,7 +1,7 @@
 import {EventsOn} from "../../wailsjs/runtime";
 import {useDownloadStore} from "@/stores/DownloadStore";
-import {EventNames} from "@/event/events";
 import {e, m} from "../../wailsjs/go/models";
+import {EventNames} from "@/types/types";
 
 /**
  * 初始化 Wails 事件监听器

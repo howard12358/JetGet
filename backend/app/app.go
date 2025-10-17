@@ -25,7 +25,7 @@ func NewApp(sysService *service.SysService, downloadService *service.DownloadSer
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 	a.SysService.Startup(ctx)
-	a.SysService.Startup(ctx)
+	a.DownloadService.Startup(ctx)
 }
 
 // DomReady is called after front-end resources have been loaded

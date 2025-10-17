@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -37,11 +38,13 @@ var Version string
 
 // DownloadFile 下载文件
 func (d *DownloadService) DownloadFile(url string) (string, error) {
+	start := time.Now()
 	taskId := uuid.New().String()
 	resp, err := util.DoHeadRequest(url, d.sysService.GetProxy())
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("head request time", time.Since(start).Milliseconds())
 	fileName := util.GetFileName(resp)
 	savePath := d.sysService.GetDownloadPath()
 	task := &m.DownloadTask{
@@ -61,11 +64,15 @@ func (d *DownloadService) DownloadFile(url string) (string, error) {
 	// 通知前端有一个新任务被创建了
 	runtime.EventsEmit(d.ctx, e.DownloadNew, task)
 
-	args := util.ToPgetArgs(url)
+	sysConfig, err := d.sysService.GetConfig()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get sys config")
+	}
+	args := util.ToPgetArgs(url, sysConfig)
 
 	progPointer := &atomic.Pointer[e.Progress]{}
 	cancelThrottle := d.setupDownloadRateThrottle(progPointer, taskId)
-
+	fmt.Println("before download", time.Since(start).Milliseconds())
 	go func() {
 		defer cancelThrottle()
 
@@ -102,14 +109,16 @@ func (d *DownloadService) DownloadFile(url string) (string, error) {
 		} else {
 			// 下载成功
 			d.log.Infoln("Download completed successfully, id:", taskId)
+			completeTime := time.Now()
 			d.db.Model(&m.DownloadTask{}).Where("id = ?", taskId).Updates(m.DownloadTask{
 				Status:      m.StatusCompleted,
-				CompletedAt: time.Now(),
+				CompletedAt: completeTime,
 			})
 			// 通知前端任务完成
 			runtime.EventsEmit(d.ctx, e.DownloadCompleted, e.Progress{
-				ID:     taskId,
-				Status: m.StatusCompleted,
+				ID:          taskId,
+				Status:      m.StatusCompleted,
+				CompletedAt: completeTime,
 			})
 		}
 	}()
@@ -156,18 +165,19 @@ func (d *DownloadService) setupDownloadRateThrottle(
 
 func (d *DownloadService) PageDownloadHistory(status string, page, size int) util.PaginatedResult {
 	var (
-		history []m.DownloadTaskResp
+		history []m.DownloadTask
 		total   int64
 	)
-	d.db.Model(&m.DownloadTask{}).Count(&total)
+	tx := d.db.Model(&m.DownloadTask{})
 
-	tx := d.db.Scopes(util.Paginate(page, size))
 	if status == string(m.StatusCompleted) {
 		tx.Where("status = ?", m.StatusCompleted)
 	} else {
 		tx.Where("status <> ?", m.StatusCompleted)
 	}
-	tx.Find(&history)
+	// 基于筛选后的查询来计算总数 (这步必须在分页前执行)
+	tx.Count(&total)
+	tx.Scopes(util.Paginate(page, size)).Order("completed_at desc").Find(&history)
 
 	return util.PaginatedResult{
 		List:  history,

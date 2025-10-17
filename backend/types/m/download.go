@@ -36,5 +36,5 @@ func (dt DownloadTask) TableName() string {
 
 type DownloadTaskResp struct {
 	Speed int64 `json:"speed"`
-	*DownloadTask
+	DownloadTask
 }

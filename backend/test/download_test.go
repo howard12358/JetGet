@@ -1,7 +1,7 @@
 package test
 
 import (
-	"JetGet/backend/service"
+	"JetGet/backend/util"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -78,7 +78,7 @@ func TestHeadRequestAndGetFileName(t *testing.T) {
 			defer server.Close()
 
 			fullURL := server.URL + tc.requestPath
-			resp, err := service.DoHeadRequest(fullURL, "")
+			resp, err := util.DoHeadRequest(fullURL, "")
 
 			if (err != nil) != tc.expectErr {
 				t.Fatalf("doHeadRequest() error = %v, expectErr %v", err, tc.expectErr)
@@ -92,7 +92,7 @@ func TestHeadRequestAndGetFileName(t *testing.T) {
 				return
 			}
 
-			filename := service.GetFileName(resp)
+			filename := util.GetFileName(resp)
 
 			if filename != tc.expectedFilename {
 				t.Errorf("getFileName() = %v, want %v", filename, tc.expectedFilename)

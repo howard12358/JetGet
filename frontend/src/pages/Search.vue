@@ -1,41 +1,14 @@
-<script setup lang="ts">
-import {FlashOutline} from "@vicons/ionicons5";
-import {Search} from '@vicons/carbon';
-import {type MessageApi, NIcon, useMessage} from "naive-ui";
-import {ref} from 'vue';
-import {DownloadFile} from "../../wailsjs/go/service/DownloadService";
-
-const message: MessageApi = useMessage();
-
-const downloadUrl = ref<string>('');
-
-const handleDownload = (): void => {
-  if (!downloadUrl.value.trim()) {
-    message.warning('请输入下载链接');
-    return;
-  }
-
-  DownloadFile(downloadUrl.value).then((result: string) => {
-    message.success(result);
-    // 可以在成功后清空输入框
-    downloadUrl.value = '';
-  }).catch((error: any) => {
-    message.error('下载失败: ' + error);
-  });
-}
-</script>
-
 <template>
   <n-flex justify="center" class="search-container">
     <n-input
         v-model:value="downloadUrl"
         placeholder="输入下载链接"
-        type="textarea"
         clearable
         :autosize="{minRows: 1, maxRows: 3}"
         class="search-input"
         size="large"
         @keydown.enter="handleDownload"
+        ref="inputRef"
     >
       <template #prefix>
         <n-icon :component="FlashOutline"/>
@@ -60,6 +33,42 @@ const handleDownload = (): void => {
     </n-input>
   </n-flex>
 </template>
+
+<script setup lang="ts">
+import {FlashOutline} from "@vicons/ionicons5";
+import {Search} from '@vicons/carbon';
+import {InputInst, type MessageApi, NIcon, useMessage} from "naive-ui";
+import {onMounted, ref} from 'vue';
+import {DownloadFile} from "../../wailsjs/go/service/DownloadService";
+
+const message: MessageApi = useMessage();
+
+const downloadUrl = ref<string>('');
+const inputRef = ref<InputInst | null>(null)
+
+const handleDownload = (): void => {
+  if (!downloadUrl.value.trim()) {
+    message.warning('请输入下载链接');
+    return;
+  }
+
+  DownloadFile(downloadUrl.value).then((result: string) => {
+    message.success(result);
+    // 可以在成功后清空输入框
+    downloadUrl.value = '';
+  }).catch((error: any) => {
+    message.error('下载失败: ' + error);
+  });
+}
+
+function handleFocus() {
+  inputRef.value?.focus()
+}
+
+onMounted(() => {
+  handleFocus()
+})
+</script>
 
 <style scoped>
 .search-container {

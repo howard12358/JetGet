@@ -82,7 +82,7 @@ func InitLogger() *zap.SugaredLogger {
 
 	// 5. 创建 Logger 实例
 	// zap.AddCaller() 会在日志中添加调用日志函数的文件名和行号
-	logger := zap.New(core, zap.AddCaller())
+	logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel))
 
 	// 6. 将 Logger 转换为 SugaredLogger 并赋值给全局变量
 	SLog = logger.Sugar()

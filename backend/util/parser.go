@@ -1,20 +1,25 @@
 package util
 
 import (
+	"JetGet/backend/types/m"
 	"os"
 	"path/filepath"
 	"runtime"
 )
 
-func ToPgetArgs(url string) []string {
+func ToPgetArgs(url string, config *m.SysConfig) []string {
 	var ags []string
 	ags = append(ags, "-x")
-	ags = append(ags, "http://127.0.0.1:7897")
+	ags = append(ags, config.Proxy)
 
 	ags = append(ags, "-p")
 	ags = append(ags, "4")
 	ags = append(ags, "-o")
-	ags = append(ags, DefaultDownloadDir())
+	if config.DownloadDir == "" {
+		ags = append(ags, DefaultDownloadDir())
+	} else {
+		ags = append(ags, config.DownloadDir)
+	}
 
 	ags = append(ags, url)
 	return ags
